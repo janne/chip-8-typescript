@@ -1,31 +1,31 @@
 import React, { useState } from 'react'
 import logo from './logo.svg'
+import { load } from './net'
+import { init, initWithData } from './ram'
 import './App.css'
 
 function App() {
-  const [filename, setFilename] = useState(
-    'https://johnearnest.github.io/chip8Archive/roms/danm8ku.ch8'
-  )
+  let ram = init()
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) =>
+  const [filename, setFilename] = useState('')
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilename(event.target.value)
+  }
 
   const loadFile = () => {
-    fetch(filename)
-      .then((resp) => resp.arrayBuffer())
-      .then((buffer) => new Uint8Array(buffer))
-      .then((arr) => alert(arr.byteLength))
+    load(filename).then((data: Uint8Array) => {
+      ram = initWithData(data)
+    })
   }
 
   return (
     <div className="App">
       <header className="App-header">
         <input value={filename} onChange={handleChange} />
-        <button onClick={loadFile}>Hellow</button>
+        <button onClick={loadFile}>Load</button>
         <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
+        <p>RAM: {ram.length} bytes</p>
         <a
           className="App-link"
           href="https://reactjs.org"
