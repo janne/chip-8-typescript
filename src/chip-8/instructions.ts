@@ -111,11 +111,16 @@ const instructions: Array<Opcode> = [
     },
   },
   {
+    // Set Vx = Vx + kk // Set Vx = Vx + Vy, set VF = carry
     pattern: 0x7000,
     mask: 0xf000,
     arguments: 'xkk',
     mnemonic: (x, kk) => `ADD V${x}, ${kk}`,
-    exec: (mem, x, kk) => mem,
+    exec: (mem, x, kk) => {
+      const registers = mem.registers.slice(0)
+      registers[x] += kk
+      return { ...mem, registers }
+    },
   },
   {
     // Set Vx = Vy
@@ -151,11 +156,19 @@ const instructions: Array<Opcode> = [
     exec: (mem, x, y) => mem,
   },
   {
+    // Set Vx = Vx + Vy, set VF = carry
     pattern: 0x8004,
     mask: 0xf00f,
     arguments: 'xy',
     mnemonic: (x, y) => `ADD V${x}, V${y}`,
-    exec: (mem, x, y) => mem,
+    exec: (mem, x, y) => {
+      const registers = mem.registers.slice(0)
+      const sum = registers[x] + registers[y]
+      registers[x] = sum % 255
+      registers[15] = sum > 255 ? 1 : 0
+      return { ...mem, registers }
+      return mem
+    },
   },
   {
     pattern: 0x8005,
@@ -275,11 +288,15 @@ const instructions: Array<Opcode> = [
     exec: (mem, x) => ({ ...mem, soundTimer: mem.registers[x] }),
   },
   {
+    // Set I = I + Vx
     pattern: 0xf01e,
     mask: 0xf0ff,
     arguments: 'x',
     mnemonic: (x) => `ADD I, V${x}`,
-    exec: (mem, x) => mem,
+    exec: (mem, x) => ({
+      ...mem,
+      indexRegister: (mem.indexRegister + mem.registers[x]) % (SIZE - 1),
+    }),
   },
   {
     pattern: 0xf029,
