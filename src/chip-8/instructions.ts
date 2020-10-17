@@ -9,14 +9,27 @@ interface Opcode {
 }
 
 const instructions: Array<Opcode> = [
-  { pattern: 0x00e0, mask: 0xffff, mnemonic: () => 'CLS', exec: (mem) => mem },
-  { pattern: 0x00ee, mask: 0xffff, mnemonic: () => 'RET', exec: (mem) => mem },
   {
+    // Clear the display
+    pattern: 0x00e0,
+    mask: 0xffff,
+    mnemonic: () => 'CLS',
+    exec: (mem) => ({ ...mem, video: new Array(64 * 32).fill(false) }),
+  },
+  {
+    // Return from a subroutine
+    pattern: 0x00ee,
+    mask: 0xffff,
+    mnemonic: () => 'RET',
+    exec: (mem) => mem,
+  },
+  {
+    // Jump to a machine code routine at nnn
     pattern: 0x0000,
     mask: 0xf000,
     arguments: 'nnn',
     mnemonic: (nnn) => `SYS ${nnn}`,
-    exec: (mem, nnn) => mem,
+    exec: (mem, _nnn) => mem,
   },
   {
     pattern: 0x1000,

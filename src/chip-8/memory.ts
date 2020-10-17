@@ -11,6 +11,7 @@ export interface Memory {
   stack: Array<number>
   soundTimer: number
   delayTimer: number
+  video: Array<boolean>
 }
 
 export const create = (): Memory => ({
@@ -21,6 +22,7 @@ export const create = (): Memory => ({
   soundTimer: 0,
   delayTimer: 0,
   programCounter: START,
+  video: new Array(64 * 32).fill(false),
 })
 
 export const createWithData = (data: Uint8Array, to: number = START) => {
