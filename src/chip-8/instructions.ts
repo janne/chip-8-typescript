@@ -188,12 +188,16 @@ const instructions: Array<Opcode> = [
     },
   },
   {
+    // Set Vx = Vx - Vy, set VF = NOT borrow
     pattern: 0x8005,
     mask: 0xf00f,
     arguments: 'xy',
     mnemonic: (x, y) => `SUB V${x}, V${y}`,
     exec: (mem, x, y) => {
-      throw new Error('Not implemented yet')
+      const registers = mem.registers.slice(0)
+      registers[x] -= registers[y]
+      registers[0xf] = registers[x] > registers[y] ? 1 : 0
+      return { ...mem, registers }
     },
   },
   {
@@ -206,12 +210,16 @@ const instructions: Array<Opcode> = [
     },
   },
   {
+    // Set Vx = Vy - Vx, set VF = NOT borrow
     pattern: 0x8007,
     mask: 0xf00f,
     arguments: 'xy',
     mnemonic: (x, y) => `SUBN V${x}, V${y}`,
     exec: (mem, x, y) => {
-      throw new Error('Not implemented yet')
+      const registers = mem.registers.slice(0)
+      registers[x] = registers[y] - registers[x]
+      registers[0xf] = registers[y] > registers[x] ? 1 : 0
+      return { ...mem, registers }
     },
   },
   {
@@ -224,6 +232,7 @@ const instructions: Array<Opcode> = [
     },
   },
   {
+    // Skip next instruction if Vx != Vy
     pattern: 0x9000,
     mask: 0xf00f,
     arguments: 'xy',
