@@ -201,12 +201,16 @@ const instructions: Array<Opcode> = [
     },
   },
   {
+    // Set Vx = Vy >> 1
     pattern: 0x8006,
     mask: 0xf00f,
     arguments: 'xy',
     mnemonic: (x, y) => (x === y ? `SHR V${x}` : `SHR V${x} V${y}`),
     exec: (mem, x, y) => {
-      throw new Error('Not implemented yet')
+      const registers = mem.registers.slice(0)
+      registers[0xf] = registers[x] & 1
+      registers[x] = registers[y] >> 1
+      return { ...mem, registers }
     },
   },
   {
@@ -223,12 +227,16 @@ const instructions: Array<Opcode> = [
     },
   },
   {
+    // Set Vx = Vy << 1
     pattern: 0x800e,
     mask: 0xf00f,
     arguments: 'xy',
     mnemonic: (x, y) => (x === y ? `SHL V${x}` : `SHL V${x}, V${y}`),
     exec: (mem, x, y) => {
-      throw new Error('Not implemented yet')
+      const registers = mem.registers.slice(0)
+      registers[0xf] = registers[x] & 0x80 ? 1 : 0
+      registers[x] = registers[y] << 1
+      return { ...mem, registers }
     },
   },
   {
