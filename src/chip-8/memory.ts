@@ -21,10 +21,7 @@ export const create = (): Memory => ({
   programCounter: START,
 })
 
-export const createWithData = (
-  data: Uint8Array,
-  to: number = START
-): Memory => {
+export const createWithData = (data: Uint8Array, to: number = START) => {
   if (data.length + to > SIZE) throw new Error('Data overflow')
   const mem = create()
   mem.ram.set(data, START)
