@@ -7,11 +7,19 @@ import CurrentStep from './CurrentStep'
 import Registers from './Registers'
 
 const App = () => {
-  let [mem, setMem] = useState(create())
+  const [mem, setMem] = useState(create())
+  const [run, setRun] = useState(false)
 
   const [filename, setFilename] = useState(
     'https://johnearnest.github.io/chip8Archive/roms/octojam1title.ch8'
   )
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      if (run) setMem(step(mem))
+    })
+    return () => clearInterval(interval)
+  }, [mem, run])
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilename(event.target.value)
@@ -38,6 +46,7 @@ const App = () => {
           <input value={filename} onChange={handleChange} />
           <button onClick={loadFile}>Load</button>
           <button onClick={handleStep}>Step</button>
+          <input type="checkbox" onClick={() => setRun(!run)} />
         </div>
         <CurrentStep mem={mem} />
         <Registers mem={mem} />
