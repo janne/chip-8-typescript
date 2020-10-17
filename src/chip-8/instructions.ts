@@ -135,25 +135,40 @@ const instructions: Array<Opcode> = [
     },
   },
   {
+    // Set Vx = Vx OR Vy
     pattern: 0x8001,
     mask: 0xf00f,
     arguments: 'xy',
     mnemonic: (x, y) => `OR V${x}, V${y}`,
-    exec: (mem, x, y) => mem,
+    exec: (mem, x, y) => {
+      const registers = mem.registers.slice(0)
+      registers[x] = registers[x] | registers[y]
+      return { ...mem, registers }
+    },
   },
   {
+    // Set Vx = Vx AND Vy
     pattern: 0x8002,
     mask: 0xf00f,
     arguments: 'xy',
     mnemonic: (x, y) => `AND V${x}, V${y}`,
-    exec: (mem, x, y) => mem,
+    exec: (mem, x, y) => {
+      const registers = mem.registers.slice(0)
+      registers[x] = registers[x] ^ registers[y]
+      return { ...mem, registers }
+    },
   },
   {
+    // Set Vx = Vx XOR Vy
     pattern: 0x8003,
     mask: 0xf00f,
     arguments: 'xy',
     mnemonic: (x, y) => `XOR V${x}, V${y}`,
-    exec: (mem, x, y) => mem,
+    exec: (mem, x, y) => {
+      const registers = mem.registers.slice(0)
+      registers[x] = registers[x] & registers[y]
+      return { ...mem, registers }
+    },
   },
   {
     // Set Vx = Vx + Vy, set VF = carry
