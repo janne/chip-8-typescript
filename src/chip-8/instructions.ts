@@ -48,11 +48,19 @@ const instructions: Array<Opcode> = [
     },
   },
   {
+    // Call subroutine at nnn
     pattern: 0x2000,
     mask: 0xf000,
     arguments: 'nnn',
     mnemonic: (nnn) => `CALL ${nnn}`,
-    exec: (mem, nnn) => mem,
+    exec: (mem, nnn) => {
+      if (nnn < 0 || nnn >= SIZE) throw new Error('Memory out of bounds')
+      return {
+        ...mem,
+        stack: [mem.programCounter, ...mem.stack],
+        programCounter: nnn,
+      }
+    },
   },
   {
     pattern: 0x3000,
