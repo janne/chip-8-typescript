@@ -63,25 +63,40 @@ const instructions: Array<Opcode> = [
     },
   },
   {
+    // Skip next instruction if Vx = kk
     pattern: 0x3000,
     mask: 0xf000,
     arguments: 'xkk',
     mnemonic: (x, kk) => `SE V${x}, ${kk}`,
-    exec: (mem, x, kk) => mem,
+    exec: (mem, x, kk) => {
+      if (mem.registers[x] === kk)
+        return { ...mem, programCounter: mem.programCounter + 4 }
+      return mem
+    },
   },
   {
+    // Skip next instruction if Vx != kk
     pattern: 0x4000,
     mask: 0xf000,
     arguments: 'xkk',
     mnemonic: (x, kk) => `SNE V${x}, ${kk}`,
-    exec: (mem, x, kk) => mem,
+    exec: (mem, x, kk) => {
+      if (mem.registers[x] !== kk)
+        return { ...mem, programCounter: mem.programCounter + 4 }
+      return mem
+    },
   },
   {
+    // Skip next instruction if Vx = Vy
     pattern: 0x5000,
     mask: 0xf00f,
     arguments: 'xy',
     mnemonic: (x, y) => `SE V${x}, V${y}`,
-    exec: (mem, x, y) => mem,
+    exec: (mem, x, y) => {
+      if (mem.registers[x] === mem.registers[y])
+        return { ...mem, programCounter: mem.programCounter + 4 }
+      return mem
+    },
   },
   {
     pattern: 0x6000,
@@ -165,7 +180,11 @@ const instructions: Array<Opcode> = [
     mask: 0xf00f,
     arguments: 'xy',
     mnemonic: (x, y) => `SNE V${x}, V${y}`,
-    exec: (mem, x, y) => mem,
+    exec: (mem, x, y) => {
+      if (mem.registers[x] !== mem.registers[y])
+        return { ...mem, programCounter: mem.programCounter + 4 }
+      return mem
+    },
   },
   {
     pattern: 0xa000,
