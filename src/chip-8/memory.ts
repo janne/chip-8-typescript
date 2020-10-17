@@ -1,3 +1,5 @@
+import { execute } from './instructions'
+
 const SIZE = 0x1000
 const START = 0x200
 
@@ -35,7 +37,4 @@ export const currentOpcode = (mem: Memory) => {
 
 export const programCounter = (mem: Memory) => mem.programCounter
 
-export const step = (mem: Memory): Memory => ({
-  ...mem,
-  programCounter: mem.programCounter + 2,
-})
+export const step = (mem: Memory): Memory => execute(mem, currentOpcode(mem))
