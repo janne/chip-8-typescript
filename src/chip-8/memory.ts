@@ -31,15 +31,11 @@ export const createWithData = (
   return mem
 }
 
-export const currentInstruction = (mem: Memory) => {
-  const instruction = Array.from(
-    mem.ram.slice(mem.programCounter, mem.programCounter + 2)
-  )
-    .map((n) => n.toString(16).padStart(2, '0'))
-    .join('')
+export const currentInstruction = (mem: Memory) =>
+  mem.ram.slice(mem.programCounter, mem.programCounter + 2)
 
-  return `${mem.programCounter.toString(16)}: ${instruction}`
-}
+export const programCounter = (mem: Memory) => mem.programCounter
+
 export const step = (mem: Memory): Memory => ({
   ...mem,
   programCounter: mem.programCounter + 2,
