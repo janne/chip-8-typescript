@@ -1,13 +1,14 @@
 import React from 'react'
+import { Memory } from './chip-8/memory'
 import './Display.css'
 
 interface Props {
-  vram: Array<Array<boolean>>
+  mem: Memory
 }
 
-const Display = ({ vram }: Props) => (
+const Display = ({ mem }: Props) => (
   <table className="Display">
-    {vram.map((row) => (
+    {mem.display.map((row) => (
       <tr>
         {row.map((cell) => (
           <td className={cell ? 'Display-cellOn' : 'Display-cellOff'} />

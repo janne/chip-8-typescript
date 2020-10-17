@@ -4,6 +4,7 @@ import { create, createWithData, step } from './chip-8/memory'
 import './App.css'
 import Display from './Display'
 import CurrentStep from './CurrentStep'
+import Registers from './Registers'
 
 const App = () => {
   let [mem, setMem] = useState(create())
@@ -39,7 +40,8 @@ const App = () => {
           <button onClick={handleStep}>Step</button>
         </div>
         <CurrentStep mem={mem} />
-        <Display vram={mem.display} />
+        <Registers mem={mem} />
+        <Display mem={mem} />
       </header>
     </div>
   )
