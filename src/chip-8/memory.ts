@@ -1,4 +1,7 @@
-interface Memory {
+const SIZE = 0x1000
+const START = 0x200
+
+export interface Memory {
   ram: Uint8Array
   programCounter: number
   registers: Uint8Array
@@ -7,9 +10,6 @@ interface Memory {
   soundTimer: number
   delayTimer: number
 }
-
-const SIZE = 0x1000
-const START = 0x200
 
 export const create = (): Memory => ({
   registers: new Uint8Array(16),
@@ -27,6 +27,11 @@ export const createWithData = (
 ): Memory => {
   if (data.length + to > SIZE) throw new Error('Data overflow')
   const mem = create()
-  mem.ram.set(data)
+  mem.ram.set(data, START)
   return mem
 }
+
+export const currentInstruction = (mem: Memory) =>
+  Array.from(mem.ram.slice(mem.programCounter, mem.programCounter + 2))
+    .map((n) => n.toString(16).padStart(2, '0'))
+    .join('')
