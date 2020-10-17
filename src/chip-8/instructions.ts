@@ -99,11 +99,16 @@ const instructions: Array<Opcode> = [
     },
   },
   {
+    // Set Vx = kk
     pattern: 0x6000,
     mask: 0xf000,
     arguments: 'xkk',
     mnemonic: (x, kk) => `LD V${x}, ${kk}`,
-    exec: (mem, x, kk) => mem,
+    exec: (mem, x, kk) => {
+      const registers = mem.registers.slice(0)
+      registers[x] = kk
+      return { ...mem, registers }
+    },
   },
   {
     pattern: 0x7000,
@@ -113,11 +118,16 @@ const instructions: Array<Opcode> = [
     exec: (mem, x, kk) => mem,
   },
   {
+    // Set Vx = Vy
     pattern: 0x8000,
     mask: 0xf00f,
     arguments: 'xy',
     mnemonic: (x, y) => `LD V${x}, V${y}`,
-    exec: (mem, x, y) => mem,
+    exec: (mem, x, y) => {
+      const registers = mem.registers.slice(0)
+      registers[x] = registers[y]
+      return { ...mem, registers }
+    },
   },
   {
     pattern: 0x8001,
@@ -187,11 +197,12 @@ const instructions: Array<Opcode> = [
     },
   },
   {
+    // Set I = nnn
     pattern: 0xa000,
     mask: 0xf000,
     arguments: 'nnn',
     mnemonic: (nnn) => `LD I, ${nnn}`,
-    exec: (mem, nnn) => mem,
+    exec: (mem, nnn) => ({ ...mem, indexRegister: nnn }),
   },
   {
     pattern: 0xb000,
@@ -229,11 +240,16 @@ const instructions: Array<Opcode> = [
     exec: (mem, x) => mem,
   },
   {
+    // Set Vx = delay timer value
     pattern: 0xf007,
     mask: 0xf0ff,
     arguments: 'x',
     mnemonic: (x) => `LD V${x}, DT`,
-    exec: (mem, x) => mem,
+    exec: (mem, x) => {
+      const registers = mem.registers.slice(0)
+      registers[x] = mem.delayTimer
+      return { ...mem, registers }
+    },
   },
   {
     pattern: 0xf00a,
@@ -243,18 +259,20 @@ const instructions: Array<Opcode> = [
     exec: (mem, x) => mem,
   },
   {
+    // Set delay timer = Vx
     pattern: 0xf015,
     mask: 0xf0ff,
     arguments: 'x',
     mnemonic: (x) => `LD DT, V${x}`,
-    exec: (mem, x) => mem,
+    exec: (mem, x) => ({ ...mem, delayTimer: mem.registers[x] }),
   },
   {
+    // Set sound timer = Vx
     pattern: 0xf018,
     mask: 0xf0ff,
     arguments: 'x',
     mnemonic: (x) => `LD ST, V${x}`,
-    exec: (mem, x) => mem,
+    exec: (mem, x) => ({ ...mem, soundTimer: mem.registers[x] }),
   },
   {
     pattern: 0xf01e,
