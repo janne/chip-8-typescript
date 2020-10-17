@@ -1,4 +1,5 @@
 import React from 'react'
+import { getMnemonic } from './chip-8/instructions'
 import { currentOpcode, Memory, programCounter } from './chip-8/memory'
 
 interface Props {
@@ -6,12 +7,14 @@ interface Props {
 }
 
 const CurrentStep = ({ mem }: Props) => {
-  const pc = programCounter(mem).toString(16)
-  const opcode = currentOpcode(mem).toString(16).padStart(4, '0')
+  const pc = programCounter(mem)
+  const opcode = currentOpcode(mem)
+  const mnemonic = getMnemonic(opcode)
 
   return (
     <div>
-      {pc}: {opcode}
+      {pc.toString(16).toUpperCase()}:{' '}
+      {opcode.toString(16).padStart(4, '0').toUpperCase()}: {mnemonic}
     </div>
   )
 }
