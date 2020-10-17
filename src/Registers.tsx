@@ -16,6 +16,8 @@ const Registers = ({ mem }: Props) => {
             ))}
             <th>PC</th>
             <th>I</th>
+            <th>DT</th>
+            <th>ST</th>
           </tr>
         </thead>
         <tbody>
@@ -25,6 +27,8 @@ const Registers = ({ mem }: Props) => {
             ))}
             <td>{mem.programCounter.toString(16).padStart(3, '0')}</td>
             <td>{mem.indexRegister.toString(16).padStart(3, '0')}</td>
+            <td>{mem.delayTimer.toString(8).padStart(2, '0')}</td>
+            <td>{mem.soundTimer.toString(8).padStart(2, '0')}</td>
           </tr>
         </tbody>
       </table>
