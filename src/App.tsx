@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import logo from './logo.svg'
 import { load } from './chip-8/net'
 import { create, createWithData, step } from './chip-8/memory'
 import './App.css'
+import Display from './Display'
 import CurrentStep from './CurrentStep'
 
 const App = () => {
@@ -39,7 +39,7 @@ const App = () => {
           <button onClick={handleStep}>Step</button>
         </div>
         <CurrentStep mem={mem} />
-        <img src={logo} className="App-logo" alt="logo" />
+        <Display vram={mem.display} />
       </header>
     </div>
   )

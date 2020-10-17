@@ -8,10 +8,10 @@ export interface Memory {
   programCounter: number
   registers: Uint8Array
   indexRegister: number
-  stack: Array<number>
+  stack: number[]
   soundTimer: number
   delayTimer: number
-  video: Array<boolean>
+  display: boolean[][]
 }
 
 export const create = (): Memory => ({
@@ -22,8 +22,10 @@ export const create = (): Memory => ({
   soundTimer: 0,
   delayTimer: 0,
   programCounter: START,
-  video: new Array(64 * 32).fill(false),
+  display: emptyDisplay(),
 })
+
+export const emptyDisplay = () => new Array(32).fill(new Array(64).fill(false))
 
 export const createWithData = (data: Uint8Array, to: number = START) => {
   if (data.length + to > SIZE) throw new Error('Data overflow')

@@ -1,4 +1,4 @@
-import { Memory } from './memory'
+import { emptyDisplay, Memory } from './memory'
 
 interface Opcode {
   pattern: number
@@ -14,7 +14,7 @@ const instructions: Array<Opcode> = [
     pattern: 0x00e0,
     mask: 0xffff,
     mnemonic: () => 'CLS',
-    exec: (mem) => ({ ...mem, video: new Array(64 * 32).fill(false) }),
+    exec: (mem) => ({ ...mem, display: emptyDisplay() }),
   },
   {
     // Return from a subroutine
