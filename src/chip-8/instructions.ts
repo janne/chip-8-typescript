@@ -34,7 +34,10 @@ const instructions: Array<Opcode> = [
     mask: 0xf000,
     arguments: 'nnn',
     mnemonic: (nnn) => `SYS ${nnn}`,
-    exec: (mem, _nnn) => mem,
+    exec: (mem, _nnn) => {
+      // NOP
+      return mem
+    },
   },
   {
     // Jump to location nnn
@@ -182,7 +185,6 @@ const instructions: Array<Opcode> = [
       registers[x] = sum % 255
       registers[15] = sum > 255 ? 1 : 0
       return { ...mem, registers }
-      return mem
     },
   },
   {
@@ -190,28 +192,36 @@ const instructions: Array<Opcode> = [
     mask: 0xf00f,
     arguments: 'xy',
     mnemonic: (x, y) => `SUB V${x}, V${y}`,
-    exec: (mem, x, y) => mem,
+    exec: (mem, x, y) => {
+      throw new Error('Not implemented yet')
+    },
   },
   {
     pattern: 0x8006,
     mask: 0xf00f,
     arguments: 'xy',
     mnemonic: (x, y) => (x === y ? `SHR V${x}` : `SHR V${x} V${y}`),
-    exec: (mem, x, y) => mem,
+    exec: (mem, x, y) => {
+      throw new Error('Not implemented yet')
+    },
   },
   {
     pattern: 0x8007,
     mask: 0xf00f,
     arguments: 'xy',
     mnemonic: (x, y) => `SUBN V${x}, V${y}`,
-    exec: (mem, x, y) => mem,
+    exec: (mem, x, y) => {
+      throw new Error('Not implemented yet')
+    },
   },
   {
     pattern: 0x800e,
     mask: 0xf00f,
     arguments: 'xy',
     mnemonic: (x, y) => (x === y ? `SHL V${x}` : `SHL V${x}, V${y}`),
-    exec: (mem, x, y) => mem,
+    exec: (mem, x, y) => {
+      throw new Error('Not implemented yet')
+    },
   },
   {
     pattern: 0x9000,
@@ -237,14 +247,21 @@ const instructions: Array<Opcode> = [
     mask: 0xf000,
     arguments: 'nnn',
     mnemonic: (nnn) => `JP V0, ${nnn}`,
-    exec: (mem, nnn) => mem,
+    exec: (mem, nnn) => {
+      throw new Error('Not implemented yet')
+    },
   },
   {
+    // Set Vx = random byte AND kk
     pattern: 0xc000,
     mask: 0xf000,
     arguments: 'xkk',
     mnemonic: (x, kk) => `RND V${x}, ${kk}`,
-    exec: (mem, x, kk) => mem,
+    exec: (mem, x, kk) => {
+      const registers = mem.registers.slice(0)
+      registers[x] = Math.round(Math.random() * 255) & kk
+      return { ...mem, registers }
+    },
   },
   {
     // Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision
@@ -285,14 +302,18 @@ const instructions: Array<Opcode> = [
     mask: 0xf0ff,
     arguments: 'x',
     mnemonic: (x) => `SKP V${x}`,
-    exec: (mem, x) => mem,
+    exec: (mem, x) => {
+      throw new Error('Not implemented yet')
+    },
   },
   {
     pattern: 0xe0a1,
     mask: 0xf0ff,
     arguments: 'x',
     mnemonic: (x) => `SKNP V${x}`,
-    exec: (mem, x) => mem,
+    exec: (mem, x) => {
+      throw new Error('Not implemented yet')
+    },
   },
   {
     // Set Vx = delay timer value
@@ -311,7 +332,9 @@ const instructions: Array<Opcode> = [
     mask: 0xf0ff,
     arguments: 'x',
     mnemonic: (x) => `LD V${x}, K`,
-    exec: (mem, x) => mem,
+    exec: (mem, x) => {
+      throw new Error('Not implemented yet')
+    },
   },
   {
     // Set delay timer = Vx
@@ -345,28 +368,36 @@ const instructions: Array<Opcode> = [
     mask: 0xf0ff,
     arguments: 'x',
     mnemonic: (x) => `LD F, V${x}`,
-    exec: (mem, x) => mem,
+    exec: (mem, x) => {
+      throw new Error('Not implemented yet')
+    },
   },
   {
     pattern: 0xf033,
     mask: 0xf0ff,
     arguments: 'x',
     mnemonic: (x) => `LD B, V${x}`,
-    exec: (mem, x) => mem,
+    exec: (mem, x) => {
+      throw new Error('Not implemented yet')
+    },
   },
   {
     pattern: 0xf055,
     mask: 0xf0ff,
     arguments: 'x',
     mnemonic: (x) => `LD [I], V${x}`,
-    exec: (mem, x) => mem,
+    exec: (mem, x) => {
+      throw new Error('Not implemented yet')
+    },
   },
   {
     pattern: 0xf065,
     mask: 0xf0ff,
     arguments: 'x',
     mnemonic: (x) => `LD V${x}, [I]`,
-    exec: (mem, x) => mem,
+    exec: (mem, x) => {
+      throw new Error('Not implemented yet')
+    },
   },
 ]
 

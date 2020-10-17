@@ -8,13 +8,18 @@ interface Props {
 
 const Display = ({ mem }: Props) => (
   <table className="Display">
-    {mem.display.map((row) => (
-      <tr>
-        {row.map((cell) => (
-          <td className={cell ? 'Display-cellOn' : 'Display-cellOff'} />
-        ))}
-      </tr>
-    ))}
+    <tbody>
+      {mem.display.map((row, i) => (
+        <tr key={`row_${i}`}>
+          {row.map((cell, j) => (
+            <td
+              key={`cell-${j}`}
+              className={cell ? 'Display-cellOn' : 'Display-cellOff'}
+            />
+          ))}
+        </tr>
+      ))}
+    </tbody>
   </table>
 )
 
