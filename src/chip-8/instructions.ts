@@ -279,8 +279,12 @@ export const getMnemonic = (opcode: number) => {
 export const execute = (mem: Memory, opcode: number): Memory => {
   const instruction = getInstruction(opcode)
   const args = getArguments(opcode, instruction.arguments)
+  const nextMem = instruction.exec(mem, ...args)
   return {
-    ...instruction.exec(mem, ...args),
-    programCounter: mem.programCounter + 2,
+    ...nextMem,
+    programCounter:
+      mem.programCounter === nextMem.programCounter
+        ? mem.programCounter + 2
+        : nextMem.programCounter,
   }
 }
