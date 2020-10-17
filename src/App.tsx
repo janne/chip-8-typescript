@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react'
 import logo from './logo.svg'
 import { load } from './chip-8/net'
-import { create, createWithData } from './chip-8/memory'
+import { create, createWithData, step } from './chip-8/memory'
 import './App.css'
 import CurrentStep from './CurrentStep'
 
@@ -26,12 +26,17 @@ const App = () => {
     loadFile()
   }, [loadFile])
 
+  const handleStep = () => {
+    setMem(step(mem))
+  }
+
   return (
     <div className="App">
       <header className="App-header">
         <div className="file">
           <input value={filename} onChange={handleChange} />
           <button onClick={loadFile}>Load</button>
+          <button onClick={handleStep}>Step</button>
         </div>
         <CurrentStep mem={mem} />
         <img src={logo} className="App-logo" alt="logo" />

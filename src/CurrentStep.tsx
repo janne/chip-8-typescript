@@ -5,8 +5,6 @@ interface Props {
   mem: Memory
 }
 
-const CurrentStep = ({ mem }: Props) => (
-  <div>Instruction: {currentInstruction(mem)}</div>
-)
+const CurrentStep = ({ mem }: Props) => <div>{currentInstruction(mem)}</div>
 
 export default CurrentStep
