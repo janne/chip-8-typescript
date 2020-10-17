@@ -3,10 +3,10 @@
 }
 
 .Display-cellOn {
-  background-color: solid 1px green;
   width: 10px;
   height: 10px;
-  background-color: solid 1px #ccc;
+  background-color: #cccccc;
+  border: solid 1px #c0c0c0;
 }
 
 .Display-cellOff {

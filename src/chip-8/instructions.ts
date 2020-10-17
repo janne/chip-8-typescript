@@ -247,11 +247,38 @@ const instructions: Array<Opcode> = [
     exec: (mem, x, kk) => mem,
   },
   {
+    // Display n-byte sprite starting at memory location I at (Vx, Vy), set VF = collision
     pattern: 0xd000,
     mask: 0xf000,
     arguments: 'xyn',
     mnemonic: (x, y, n) => `DRW V${x}, V${y}, ${n}`,
-    exec: (mem, x, y, n) => mem,
+    exec: (mem, x, y, n) => {
+      const registers = mem.registers.slice(0)
+      registers[0xf] = 1
+      const display = mem.display.map((row) => row.slice(0))
+      const xx = mem.registers[x]
+      const yy = mem.registers[y]
+      for (let line = 0; line < n; line++) {
+        const pixels = mem.ram[mem.indexRegister + line]
+          .toString(2)
+          .padStart(8, '0')
+          .split('')
+          .map((s) => s === '1')
+        pixels.forEach((v, i) => {
+          if (v) {
+            const dx = (yy + line) % 32
+            const dy = (xx + i) % 64
+            if (display[dx][dy]) {
+              registers[0xf] = 1
+              display[dx][dy] = false
+            } else {
+              display[dx][dy] = true
+            }
+          }
+        })
+      }
+      return { ...mem, display, registers }
+    },
   },
   {
     pattern: 0xe09e,
