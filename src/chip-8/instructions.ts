@@ -260,12 +260,16 @@ const instructions: Array<Opcode> = [
     exec: (mem, nnn) => ({ ...mem, indexRegister: nnn }),
   },
   {
+    // Jump to location nnn + V0
     pattern: 0xb000,
     mask: 0xf000,
     arguments: 'nnn',
     mnemonic: (nnn) => `JP V0, ${nnn}`,
     exec: (mem, nnn) => {
-      throw new Error('Not implemented yet')
+      const programCounter = mem.registers[0] + nnn
+      if (programCounter < 0 || programCounter >= SIZE)
+        throw new Error('Memory out of bounds')
+      return { ...mem, programCounter }
     },
   },
   {
