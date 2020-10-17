@@ -31,8 +31,10 @@ export const createWithData = (
   return mem
 }
 
-export const currentInstruction = (mem: Memory) =>
-  mem.ram.slice(mem.programCounter, mem.programCounter + 2)
+export const currentOpcode = (mem: Memory) => {
+  const p = mem.ram.slice(mem.programCounter, mem.programCounter + 2)
+  return (p[0] << 8) + p[1]
+}
 
 export const programCounter = (mem: Memory) => mem.programCounter
 
