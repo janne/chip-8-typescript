@@ -1,4 +1,4 @@
-import { emptyDisplay, Memory } from './memory'
+import { emptyDisplay, Memory, SIZE } from './memory'
 
 interface Opcode {
   pattern: number
@@ -21,7 +21,12 @@ const instructions: Array<Opcode> = [
     pattern: 0x00ee,
     mask: 0xffff,
     mnemonic: () => 'RET',
-    exec: (mem) => mem,
+    exec: (mem) => {
+      if (mem.stack.length === 0) throw new Error('Stack underflow')
+      mem.programCounter = mem.stack[0]
+      mem.stack = mem.stack.slice(1)
+      return mem
+    },
   },
   {
     // Jump to a machine code routine at nnn
@@ -32,11 +37,15 @@ const instructions: Array<Opcode> = [
     exec: (mem, _nnn) => mem,
   },
   {
+    // Jump to location nnn
     pattern: 0x1000,
     mask: 0xf000,
     arguments: 'nnn',
     mnemonic: (nnn) => `JP ${nnn}`,
-    exec: (mem, nnn) => mem,
+    exec: (mem, nnn) => {
+      if (nnn < 0 || nnn >= SIZE) throw new Error('Memory out of bounds')
+      return { ...mem, programCounter: nnn }
+    },
   },
   {
     pattern: 0x2000,

@@ -1,6 +1,6 @@
 import { execute } from './instructions'
 
-const SIZE = 0x1000
+export const SIZE = 0x1000
 const START = 0x200
 
 export interface Memory {
