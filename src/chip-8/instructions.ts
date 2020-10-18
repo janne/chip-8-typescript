@@ -110,7 +110,7 @@ const instructions: Array<Opcode> = [
     arguments: 'xkk',
     mnemonic: (x, kk) => `LD V${x}, ${kk}`,
     exec: (mem, x, kk) => {
-      const registers = mem.registers.slice(0)
+      const registers = mem.registers.slice()
       registers[x] = kk
       return { ...mem, registers }
     },
@@ -122,7 +122,7 @@ const instructions: Array<Opcode> = [
     arguments: 'xkk',
     mnemonic: (x, kk) => `ADD V${x}, ${kk}`,
     exec: (mem, x, kk) => {
-      const registers = mem.registers.slice(0)
+      const registers = mem.registers.slice()
       registers[x] += kk
       return { ...mem, registers }
     },
@@ -134,7 +134,7 @@ const instructions: Array<Opcode> = [
     arguments: 'xy',
     mnemonic: (x, y) => `LD V${x}, V${y}`,
     exec: (mem, x, y) => {
-      const registers = mem.registers.slice(0)
+      const registers = mem.registers.slice()
       registers[x] = registers[y]
       return { ...mem, registers }
     },
@@ -146,7 +146,7 @@ const instructions: Array<Opcode> = [
     arguments: 'xy',
     mnemonic: (x, y) => `OR V${x}, V${y}`,
     exec: (mem, x, y) => {
-      const registers = mem.registers.slice(0)
+      const registers = mem.registers.slice()
       registers[x] = registers[x] | registers[y]
       return { ...mem, registers }
     },
@@ -158,8 +158,8 @@ const instructions: Array<Opcode> = [
     arguments: 'xy',
     mnemonic: (x, y) => `AND V${x}, V${y}`,
     exec: (mem, x, y) => {
-      const registers = mem.registers.slice(0)
-      registers[x] = registers[x] ^ registers[y]
+      const registers = mem.registers.slice()
+      registers[x] = registers[x] & registers[y]
       return { ...mem, registers }
     },
   },
@@ -170,8 +170,8 @@ const instructions: Array<Opcode> = [
     arguments: 'xy',
     mnemonic: (x, y) => `XOR V${x}, V${y}`,
     exec: (mem, x, y) => {
-      const registers = mem.registers.slice(0)
-      registers[x] = registers[x] & registers[y]
+      const registers = mem.registers.slice()
+      registers[x] = registers[x] ^ registers[y]
       return { ...mem, registers }
     },
   },
@@ -182,10 +182,10 @@ const instructions: Array<Opcode> = [
     arguments: 'xy',
     mnemonic: (x, y) => `ADD V${x}, V${y}`,
     exec: (mem, x, y) => {
-      const registers = mem.registers.slice(0)
+      const registers = mem.registers.slice()
       const sum = registers[x] + registers[y]
-      registers[x] = sum % 255
-      registers[15] = sum > 255 ? 1 : 0
+      registers[0xf] = sum > 255 ? 1 : 0
+      registers[x] = sum % 0x100
       return { ...mem, registers }
     },
   },
@@ -196,9 +196,9 @@ const instructions: Array<Opcode> = [
     arguments: 'xy',
     mnemonic: (x, y) => `SUB V${x}, V${y}`,
     exec: (mem, x, y) => {
-      const registers = mem.registers.slice(0)
-      registers[x] -= registers[y]
+      const registers = mem.registers.slice()
       registers[0xf] = registers[x] > registers[y] ? 1 : 0
+      registers[x] = registers[x] - registers[y]
       return { ...mem, registers }
     },
   },
@@ -209,7 +209,7 @@ const instructions: Array<Opcode> = [
     arguments: 'xy',
     mnemonic: (x, y) => (x === y ? `SHR V${x}` : `SHR V${x} V${y}`),
     exec: (mem, x, y) => {
-      const registers = mem.registers.slice(0)
+      const registers = mem.registers.slice()
       registers[0xf] = registers[x] & 1
       registers[x] = registers[y] >> 1
       return { ...mem, registers }
@@ -222,7 +222,7 @@ const instructions: Array<Opcode> = [
     arguments: 'xy',
     mnemonic: (x, y) => `SUBN V${x}, V${y}`,
     exec: (mem, x, y) => {
-      const registers = mem.registers.slice(0)
+      const registers = mem.registers.slice()
       registers[x] = registers[y] - registers[x]
       registers[0xf] = registers[y] > registers[x] ? 1 : 0
       return { ...mem, registers }
@@ -235,7 +235,7 @@ const instructions: Array<Opcode> = [
     arguments: 'xy',
     mnemonic: (x, y) => (x === y ? `SHL V${x}` : `SHL V${x}, V${y}`),
     exec: (mem, x, y) => {
-      const registers = mem.registers.slice(0)
+      const registers = mem.registers.slice()
       registers[0xf] = registers[x] & 0x80 ? 1 : 0
       registers[x] = registers[y] << 1
       return { ...mem, registers }
@@ -281,7 +281,7 @@ const instructions: Array<Opcode> = [
     arguments: 'xkk',
     mnemonic: (x, kk) => `RND V${x}, ${kk}`,
     exec: (mem, x, kk) => {
-      const registers = mem.registers.slice(0)
+      const registers = mem.registers.slice()
       registers[x] = Math.round(Math.random() * 255) & kk
       return { ...mem, registers }
     },
@@ -293,9 +293,9 @@ const instructions: Array<Opcode> = [
     arguments: 'xyn',
     mnemonic: (x, y, n) => `DRW V${x}, V${y}, ${n}`,
     exec: (mem, x, y, n) => {
-      const registers = mem.registers.slice(0)
-      registers[0xf] = 1
-      const display = mem.display.map((row) => row.slice(0))
+      const registers = mem.registers.slice()
+      registers[0xf] = 0
+      const display = mem.display.map((row) => row.slice())
       const xx = mem.registers[x]
       const yy = mem.registers[y]
       for (let line = 0; line < n; line++) {
@@ -306,13 +306,13 @@ const instructions: Array<Opcode> = [
           .map((s) => s === '1')
         pixels.forEach((v, i) => {
           if (v) {
-            const dx = (yy + line) % 32
-            const dy = (xx + i) % 64
-            if (display[dx][dy]) {
+            const dy = (yy + line) % 32
+            const dx = (xx + i) % 64
+            if (display[dy][dx]) {
               registers[0xf] = 1
-              display[dx][dy] = false
+              display[dy][dx] = false
             } else {
-              display[dx][dy] = true
+              display[dy][dx] = true
             }
           }
         })
@@ -321,6 +321,7 @@ const instructions: Array<Opcode> = [
     },
   },
   {
+    // Skip next instruction if key with the value of Vx is pressed
     pattern: 0xe09e,
     mask: 0xf0ff,
     arguments: 'x',
@@ -330,6 +331,7 @@ const instructions: Array<Opcode> = [
     },
   },
   {
+    // Skip next instruction if key with the value of Vx is not pressed
     pattern: 0xe0a1,
     mask: 0xf0ff,
     arguments: 'x',
@@ -345,12 +347,13 @@ const instructions: Array<Opcode> = [
     arguments: 'x',
     mnemonic: (x) => `LD V${x}, DT`,
     exec: (mem, x) => {
-      const registers = mem.registers.slice(0)
+      const registers = mem.registers.slice()
       registers[x] = mem.delayTimer
       return { ...mem, registers }
     },
   },
   {
+    // Wait for a key press, store the value of the key in Vx
     pattern: 0xf00a,
     mask: 0xf0ff,
     arguments: 'x',
