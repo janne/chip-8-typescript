@@ -13,7 +13,7 @@ const Registers = ({ mem }: Props) => (
       <thead>
         <tr>
           {Array.from(mem.registers).map((_, i) => (
-            <th key={`header-${i}`}>{i.toString(16)}</th>
+            <th key={`header-${i}`}>{i.toString(16).toUpperCase()}</th>
           ))}
           <th>PC</th>
           <th>I</th>
@@ -25,12 +25,18 @@ const Registers = ({ mem }: Props) => (
       <tbody>
         <tr>
           {Array.from(mem.registers).map((r, i) => (
-            <td key={`data-${i}`}>{r.toString(16).padStart(2, '0')}</td>
+            <td key={`data-${i}`}>
+              {r.toString(16).toUpperCase().padStart(2, '0')}
+            </td>
           ))}
-          <td>{mem.programCounter.toString(16).padStart(3, '0')}</td>
-          <td>{mem.indexRegister.toString(16).padStart(3, '0')}</td>
-          <td>{mem.delayTimer.toString(16).padStart(2, '0')}</td>
-          <td>{mem.soundTimer.toString(16).padStart(2, '0')}</td>
+          <td>
+            {mem.programCounter.toString(16).toUpperCase().padStart(3, '0')}
+          </td>
+          <td>
+            {mem.indexRegister.toString(16).toUpperCase().padStart(3, '0')}
+          </td>
+          <td>{mem.delayTimer.toString(16).toUpperCase().padStart(2, '0')}</td>
+          <td>{mem.soundTimer.toString(16).toUpperCase().padStart(2, '0')}</td>
           <td>{getMnemonic(currentOpcode(mem))}</td>
         </tr>
       </tbody>
