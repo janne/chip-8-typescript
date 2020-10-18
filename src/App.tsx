@@ -9,7 +9,9 @@ const App = () => {
   const [mem, setMem] = useState(create())
   const [run, setRun] = useState(false)
 
-  const [filename, setFilename] = useState('/test_opcode.ch8')
+  const [filename, setFilename] = useState(
+    'https://johnearnest.github.io/chip8Archive/roms/br8kout.ch8'
+  )
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilename(event.target.value)
