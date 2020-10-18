@@ -1,6 +1,6 @@
 import React from 'react'
 import { getMnemonic } from './chip-8/instructions'
-import { currentOpcode, Memory, programCounter } from './chip-8/memory'
+import { currentOpcode, Memory } from './chip-8/memory'
 import './Registers.css'
 
 interface Props {
@@ -29,8 +29,8 @@ const Registers = ({ mem }: Props) => (
           ))}
           <td>{mem.programCounter.toString(16).padStart(3, '0')}</td>
           <td>{mem.indexRegister.toString(16).padStart(3, '0')}</td>
-          <td>{mem.delayTimer.toString(8).padStart(2, '0')}</td>
-          <td>{mem.soundTimer.toString(8).padStart(2, '0')}</td>
+          <td>{mem.delayTimer.toString(16).padStart(2, '0')}</td>
+          <td>{mem.soundTimer.toString(16).padStart(2, '0')}</td>
           <td>{getMnemonic(currentOpcode(mem))}</td>
         </tr>
       </tbody>
