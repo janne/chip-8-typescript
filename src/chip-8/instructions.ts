@@ -427,7 +427,7 @@ const instructions: Array<Opcode> = [
       if (x < 0 || x > 15) throw new Error('Registers out of bounds')
       if (mem.indexRegister + x > SIZE) throw new Error('Memory out of bounds')
       const ram = mem.ram.slice()
-      mem.registers.slice(0, x).forEach((v, i) => {
+      mem.registers.slice(0, x + 1).forEach((v, i) => {
         ram[mem.indexRegister + i] = v
       })
       return { ...mem, ram }
@@ -443,7 +443,7 @@ const instructions: Array<Opcode> = [
       const registers = mem.registers.slice()
       if (x < 0 || x > 15) throw new Error('Registers out of bounds')
       mem.ram
-        .slice(mem.indexRegister, mem.indexRegister + x)
+        .slice(mem.indexRegister, mem.indexRegister + x + 1)
         .forEach((v, i) => {
           registers[i] = v
         })
