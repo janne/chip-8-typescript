@@ -396,30 +396,51 @@ const instructions: Array<Opcode> = [
     },
   },
   {
+    // Store BCD representation of Vx in memory locations I, I+1, and I+2
     pattern: 0xf033,
     mask: 0xf0ff,
     arguments: 'x',
     mnemonic: (x) => `LD B, V${x}`,
     exec: (mem, x) => {
-      throw new Error('Not implemented yet')
+      const ram = mem.ram.slice()
+      const v = mem.registers[x].toString(10)
+      ram[mem.indexRegister] = parseInt(v[v.length - 3] || '0', 10)
+      ram[mem.indexRegister + 1] = parseInt(v[v.length - 2] || '0', 10)
+      ram[mem.indexRegister + 2] = parseInt(v[v.length - 1] || '0', 10)
+      return { ...mem, ram }
     },
   },
   {
+    // Store registers V0 through Vx in memory starting at location I
     pattern: 0xf055,
     mask: 0xf0ff,
     arguments: 'x',
     mnemonic: (x) => `LD [I], V${x}`,
     exec: (mem, x) => {
-      throw new Error('Not implemented yet')
+      if (x < 0 || x > 15) throw new Error('Registers out of bounds')
+      if (mem.indexRegister + x > SIZE) throw new Error('Memory out of bounds')
+      const ram = mem.ram.slice()
+      mem.registers.slice(0, x).forEach((v, i) => {
+        ram[mem.indexRegister + i] = v
+      })
+      return { ...mem, ram }
     },
   },
   {
+    // Read registers V0 through Vx from memory starting at location I
     pattern: 0xf065,
     mask: 0xf0ff,
     arguments: 'x',
     mnemonic: (x) => `LD V${x}, [I]`,
     exec: (mem, x) => {
-      throw new Error('Not implemented yet')
+      const registers = mem.registers.slice()
+      if (x < 0 || x > 15) throw new Error('Registers out of bounds')
+      mem.ram
+        .slice(mem.indexRegister, mem.indexRegister + x)
+        .forEach((v, i) => {
+          registers[i] = v
+        })
+      return { ...mem, registers }
     },
   },
 ]
