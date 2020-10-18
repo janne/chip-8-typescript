@@ -23,9 +23,11 @@ const instructions: Array<Opcode> = [
     mnemonic: () => 'RET',
     exec: (mem) => {
       if (mem.stack.length === 0) throw new Error('Stack underflow')
-      mem.programCounter = mem.stack[0]
-      mem.stack = mem.stack.slice(1)
-      return mem
+      return {
+        ...mem,
+        stack: mem.stack.slice(1),
+        programCounter: mem.stack[0] + 2,
+      }
     },
   },
   {
