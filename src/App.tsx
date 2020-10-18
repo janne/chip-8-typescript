@@ -10,7 +10,7 @@ const App = () => {
   const [run, setRun] = useState(false)
 
   const [filename, setFilename] = useState(
-    'https://johnearnest.github.io/chip8Archive/roms/octojam1title.ch8'
+    'https://johnearnest.github.io/chip8Archive/roms/br8kout.ch8'
   )
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
