@@ -3,7 +3,6 @@ import { load } from './chip-8/net'
 import { create, createWithData, step } from './chip-8/memory'
 import './App.css'
 import Display from './Display'
-import CurrentStep from './CurrentStep'
 import Registers from './Registers'
 
 const App = () => {
@@ -65,7 +64,6 @@ const App = () => {
           <button onClick={handleStep}>Step</button>
           <input type="checkbox" onClick={() => setRun(!run)} />
         </div>
-        <CurrentStep mem={mem} />
         <Registers mem={mem} />
         <Display mem={mem} />
       </header>

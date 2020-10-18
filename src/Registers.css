@@ -1,0 +1,17 @@
+table {
+  border-collapse: collapse;
+  font-size: small;
+  margin: 20px;
+}
+
+td {
+  border: solid 1px #555;
+}
+
+th {
+  width: 30px;
+}
+
+th.mnemonic {
+  width: 150px;
+}
