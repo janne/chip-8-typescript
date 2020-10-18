@@ -387,12 +387,16 @@ const instructions: Array<Opcode> = [
     }),
   },
   {
+    // Set I = location of sprite for digit Vx
     pattern: 0xf029,
     mask: 0xf0ff,
     arguments: 'x',
     mnemonic: (x) => `LD F, V${x}`,
     exec: (mem, x) => {
-      throw new Error('Not implemented yet')
+      if (x < 0 || x > 15) throw new Error('Registers out of bounds')
+      const digit = mem.registers[x]
+      if (digit < 0 || digit > 15) throw new Error('Memory out of bounds')
+      return { ...mem, indexRegister: digit * 5 }
     },
   },
   {

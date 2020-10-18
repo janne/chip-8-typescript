@@ -1,4 +1,5 @@
 import { execute } from './instructions'
+import font from './font'
 
 export const SIZE = 0x1000
 const START = 0x200
@@ -14,16 +15,20 @@ export interface Memory {
   display: boolean[][]
 }
 
-export const create = (): Memory => ({
-  registers: new Uint8Array(16),
-  ram: new Uint8Array(SIZE),
-  indexRegister: 0,
-  stack: [],
-  soundTimer: 0,
-  delayTimer: 0,
-  programCounter: START,
-  display: emptyDisplay(),
-})
+export const create = (): Memory => {
+  const ram = new Uint8Array(SIZE)
+  ram.set(font)
+  return {
+    registers: new Uint8Array(16),
+    ram,
+    indexRegister: 0,
+    stack: [],
+    soundTimer: 0,
+    delayTimer: 0,
+    programCounter: START,
+    display: emptyDisplay(),
+  }
+}
 
 export const emptyDisplay = () => new Array(32).fill(new Array(64).fill(false))
 
