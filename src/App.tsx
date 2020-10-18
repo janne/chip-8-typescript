@@ -14,13 +14,6 @@ const App = () => {
     'https://johnearnest.github.io/chip8Archive/roms/octojam1title.ch8'
   )
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (run) setMem(step(mem))
-    })
-    return () => clearInterval(interval)
-  }, [mem, run])
-
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilename(event.target.value)
   }
@@ -38,6 +31,30 @@ const App = () => {
   const handleStep = () => {
     setMem(step(mem))
   }
+
+  useEffect(() => {
+    if (!run) return
+    let timerId: number
+
+    const f = () => {
+      for (let i = 0; i < 8; i++) {
+        setMem((mem) => step(mem))
+      }
+      setMem((mem) => {
+        return {
+          ...mem,
+          delayTimer: mem.delayTimer > 0 ? mem.delayTimer - 1 : 0,
+          soundTimer: mem.soundTimer > 0 ? mem.soundTimer - 1 : 0,
+        }
+      })
+
+      timerId = requestAnimationFrame(f)
+    }
+
+    timerId = requestAnimationFrame(f)
+
+    return () => cancelAnimationFrame(timerId)
+  }, [run])
 
   return (
     <div className="App">
