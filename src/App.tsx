@@ -55,7 +55,7 @@ const App = () => {
           <input value={filename} onChange={handleChange} />
           <button onClick={loadFile}>Load</button>
           <button onClick={handleStep}>Step</button>
-          <input type="checkbox" onClick={() => setRun(!run)} />
+          <button onClick={() => setRun(!run)}>{run ? 'Stop' : 'Run'}</button>
         </div>
         <Registers mem={mem} />
         <Display mem={mem} />
