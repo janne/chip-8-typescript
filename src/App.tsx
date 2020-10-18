@@ -9,18 +9,18 @@ const App = () => {
   const [mem, setMem] = useState(create())
   const [run, setRun] = useState(false)
 
-  const [filename, setFilename] = useState(
-    'https://johnearnest.github.io/chip8Archive/roms/br8kout.ch8'
-  )
+  const [filename, setFilename] = useState('/BC_test.ch8')
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFilename(event.target.value)
   }
 
   const loadFile = useCallback(() => {
-    load(filename).then((data: Uint8Array) => {
-      setMem(createWithData(data))
-    })
+    load(filename)
+      .then((data: Uint8Array) => {
+        setMem(createWithData(data))
+      })
+      .catch((e) => console.log('Something went wrong', e))
   }, [filename])
 
   useEffect(() => {
