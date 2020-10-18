@@ -41,4 +41,20 @@ export const currentOpcode = (mem: Memory) => {
 
 export const programCounter = (mem: Memory) => mem.programCounter
 
-export const step = (mem: Memory): Memory => execute(mem, currentOpcode(mem))
+const getTimerDecreaser = () => {
+  let tick = 0
+  return (mem: Memory) => {
+    tick = (tick + 1) % 8
+    if (tick > 0) return mem
+    return {
+      ...mem,
+      delayTimer: mem.delayTimer > 0 ? mem.delayTimer - 1 : 0,
+      soundTimer: mem.soundTimer > 0 ? mem.soundTimer - 1 : 0,
+    }
+  }
+}
+
+const decreaseTimers = getTimerDecreaser()
+
+export const step = (mem: Memory): Memory =>
+  decreaseTimers(execute(mem, currentOpcode(mem)))

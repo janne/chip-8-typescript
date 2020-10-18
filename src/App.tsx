@@ -39,13 +39,6 @@ const App = () => {
       for (let i = 0; i < 8; i++) {
         setMem((mem) => step(mem))
       }
-      setMem((mem) => {
-        return {
-          ...mem,
-          delayTimer: mem.delayTimer > 0 ? mem.delayTimer - 1 : 0,
-          soundTimer: mem.soundTimer > 0 ? mem.soundTimer - 1 : 0,
-        }
-      })
 
       timerId = requestAnimationFrame(f)
     }
