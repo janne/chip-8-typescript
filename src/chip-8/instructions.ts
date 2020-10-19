@@ -36,10 +36,7 @@ const instructions: Array<Opcode> = [
     mask: 0xf000,
     arguments: 'nnn',
     mnemonic: (nnn) => `SYS ${nnn}`,
-    exec: (mem, _nnn) => {
-      // NOP
-      return mem
-    },
+    exec: (mem, _nnn) => mem,
   },
   {
     // Jump to location nnn
@@ -47,10 +44,7 @@ const instructions: Array<Opcode> = [
     mask: 0xf000,
     arguments: 'nnn',
     mnemonic: (nnn) => `JP ${nnn}`,
-    exec: (mem, nnn) => {
-      if (nnn < 0 || nnn >= SIZE) throw new Error('Memory out of bounds')
-      return { ...mem, programCounter: nnn }
-    },
+    exec: (mem, nnn) => ({ ...mem, programCounter: nnn }),
   },
   {
     // Call subroutine at nnn
@@ -58,14 +52,11 @@ const instructions: Array<Opcode> = [
     mask: 0xf000,
     arguments: 'nnn',
     mnemonic: (nnn) => `CALL ${nnn}`,
-    exec: (mem, nnn) => {
-      if (nnn < 0 || nnn >= SIZE) throw new Error('Memory out of bounds')
-      return {
-        ...mem,
-        stack: [mem.programCounter, ...mem.stack],
-        programCounter: nnn,
-      }
-    },
+    exec: (mem, nnn) => ({
+      ...mem,
+      stack: [mem.programCounter, ...mem.stack],
+      programCounter: nnn,
+    }),
   },
   {
     // Skip next instruction if Vx = kk
@@ -73,11 +64,10 @@ const instructions: Array<Opcode> = [
     mask: 0xf000,
     arguments: 'xkk',
     mnemonic: (x, kk) => `SE V${x}, ${kk}`,
-    exec: (mem, x, kk) => {
-      if (mem.registers[x] === kk)
-        return { ...mem, programCounter: mem.programCounter + 4 }
-      return mem
-    },
+    exec: (mem, x, kk) =>
+      mem.registers[x] === kk
+        ? { ...mem, programCounter: mem.programCounter + 4 }
+        : mem,
   },
   {
     // Skip next instruction if Vx != kk
@@ -85,11 +75,10 @@ const instructions: Array<Opcode> = [
     mask: 0xf000,
     arguments: 'xkk',
     mnemonic: (x, kk) => `SNE V${x}, ${kk}`,
-    exec: (mem, x, kk) => {
-      if (mem.registers[x] !== kk)
-        return { ...mem, programCounter: mem.programCounter + 4 }
-      return mem
-    },
+    exec: (mem, x, kk) =>
+      mem.registers[x] !== kk
+        ? { ...mem, programCounter: mem.programCounter + 4 }
+        : mem,
   },
   {
     // Skip next instruction if Vx = Vy
@@ -97,11 +86,10 @@ const instructions: Array<Opcode> = [
     mask: 0xf00f,
     arguments: 'xy',
     mnemonic: (x, y) => `SE V${x}, V${y}`,
-    exec: (mem, x, y) => {
-      if (mem.registers[x] === mem.registers[y])
-        return { ...mem, programCounter: mem.programCounter + 4 }
-      return mem
-    },
+    exec: (mem, x, y) =>
+      mem.registers[x] === mem.registers[y]
+        ? { ...mem, programCounter: mem.programCounter + 4 }
+        : mem,
   },
   {
     // Set Vx = kk
@@ -247,11 +235,10 @@ const instructions: Array<Opcode> = [
     mask: 0xf00f,
     arguments: 'xy',
     mnemonic: (x, y) => `SNE V${x}, V${y}`,
-    exec: (mem, x, y) => {
-      if (mem.registers[x] !== mem.registers[y])
-        return { ...mem, programCounter: mem.programCounter + 4 }
-      return mem
-    },
+    exec: (mem, x, y) =>
+      mem.registers[x] !== mem.registers[y]
+        ? { ...mem, programCounter: mem.programCounter + 4 }
+        : mem,
   },
   {
     // Set I = nnn
@@ -459,9 +446,9 @@ const getInstruction = (opcode: number) => {
   return instruction
 }
 
-const getArguments = (opcode: number, args?: string) => {
-  if (!args) return []
-  switch (args) {
+const getArguments = (argsType: string | undefined, opcode: number) => {
+  if (!argsType) return []
+  switch (argsType) {
     case 'nnn':
       return [opcode & 0x0fff]
     case 'x':
@@ -473,12 +460,41 @@ const getArguments = (opcode: number, args?: string) => {
     case 'xyn':
       return [(opcode & 0x0f00) >> 8, (opcode & 0x00f0) >> 4, opcode & 0x000f]
   }
-  throw new Error(`Unknown arguments: ${args}`)
+  throw new Error(`Unknown arguments: ${argsType}`)
+}
+
+const checkArguments = (argsType: string | undefined, ...args: number[]) => {
+  if (!argsType) return
+  const [a, b, c] = args
+  switch (argsType) {
+    case 'nnn':
+      if (a < 0 || a >= SIZE) throw new Error(`Memory out of bounds: ${a}`)
+      break
+    case 'x':
+      if (a < 0 || a > 15) throw new Error(`Register out of bounds: ${a}`)
+      break
+    case 'xkk':
+      if (b === undefined) throw new Error('Invalid arguments')
+      if (a < 0 || a > 15) throw new Error(`Register out of bounds: ${a}`)
+      if (b < 0 || b > 255) throw new Error(`Number out of bounds: ${b}`)
+      break
+    case 'xy':
+      if (b === undefined) throw new Error('Invalid arguments')
+      if (a < 0 || a > 15) throw new Error(`Register out of bounds: ${a}`)
+      if (b < 0 || b > 15) throw new Error(`Register out of bounds: ${b}`)
+      break
+    case 'xyn':
+      if (b === undefined || c === undefined)
+        throw new Error('Invalid arguments')
+      if (a < 0 || a > 15) throw new Error(`Register out of bounds: ${a}`)
+      if (b < 0 || b > 15) throw new Error(`Register out of bounds: ${b}`)
+      if (c < 0 || c > 15) throw new Error(`Value out of bounds: ${c}`)
+  }
 }
 
 export const getMnemonic = (opcode: number) => {
   const instruction = getInstruction(opcode)
-  const args = getArguments(opcode, instruction.arguments).map((a) =>
+  const args = getArguments(instruction.arguments, opcode).map((a) =>
     a.toString(16).toUpperCase()
   )
   return instruction.mnemonic(...args)
@@ -486,7 +502,8 @@ export const getMnemonic = (opcode: number) => {
 
 export const execute = (mem: Memory, opcode: number): Memory => {
   const instruction = getInstruction(opcode)
-  const args = getArguments(opcode, instruction.arguments)
+  const args = getArguments(instruction.arguments, opcode)
+  checkArguments(instruction.arguments, ...args)
   const nextMem = instruction.exec(mem, ...args)
   return {
     ...nextMem,
