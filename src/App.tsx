@@ -12,7 +12,7 @@ const App = () => {
   const key = useKeyPress()
 
   const [filename, setFilename] = useState(
-    'https://johnearnest.github.io/chip8Archive/roms/br8kout.ch8'
+    'https://johnearnest.github.io/chip8Archive/roms/snake.ch8'
   )
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -23,6 +23,7 @@ const App = () => {
     load(filename)
       .then((data: Uint8Array) => {
         setMem(createWithData(data))
+        setRunning(false)
       })
       .catch((e) => console.log('Something went wrong', e))
   }, [filename])
@@ -74,7 +75,7 @@ const App = () => {
           </button>
         </div>
         <Display mem={mem} />
-        {running || <Registers mem={mem} />}
+        {!running && <Registers mem={mem} />}
       </header>
     </div>
   )
