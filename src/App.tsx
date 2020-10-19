@@ -8,7 +8,7 @@ import useKeyPress from './useKeyPress'
 
 const App = () => {
   const [mem, setMem] = useState(create())
-  const [run, setRun] = useState(false)
+  const [running, setRunning] = useState(false)
   const key = useKeyPress()
 
   const [filename, setFilename] = useState(
@@ -32,7 +32,7 @@ const App = () => {
   }, [loadFile])
 
   const handleStep = () => {
-    setMem(step(mem))
+    if (!running) setMem(step(mem, true))
   }
 
   useEffect(() => {
@@ -56,17 +56,25 @@ const App = () => {
     setMem((mem) => ({ ...mem, pressedKey: key }))
   }, [key])
 
+  useEffect(() => {
+    setMem((mem) => ({ ...mem, running }))
+  }, [running])
+
   return (
     <div className="App">
       <header className="App-header">
         <div className="file">
           <input value={filename} onChange={handleChange} />
           <button onClick={loadFile}>Load</button>
-          <button onClick={handleStep}>Step</button>
-          <button onClick={() => setRun(!run)}>{run ? 'Stop' : 'Run'}</button>
+          <button onClick={handleStep} disabled={running}>
+            Step
+          </button>
+          <button onClick={() => setRunning(!running)}>
+            {running ? 'Stop' : 'Run'}
+          </button>
         </div>
-        <Registers mem={mem} />
         <Display mem={mem} />
+        {running || <Registers mem={mem} />}
       </header>
     </div>
   )

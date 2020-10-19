@@ -14,6 +14,7 @@ export interface Memory {
   delayTimer: number
   display: boolean[][]
   pressedKey: number | null
+  running: boolean
 }
 
 export const create = (): Memory => {
@@ -29,6 +30,7 @@ export const create = (): Memory => {
     programCounter: START,
     display: emptyDisplay(),
     pressedKey: null,
+    running: false,
   }
 }
 
@@ -63,5 +65,5 @@ const getTimerDecreaser = () => {
 
 const decreaseTimers = getTimerDecreaser()
 
-export const step = (mem: Memory): Memory =>
-  decreaseTimers(execute(mem, currentOpcode(mem)))
+export const step = (mem: Memory, single = false): Memory =>
+  decreaseTimers(mem.running || single ? execute(mem, currentOpcode(mem)) : mem)
