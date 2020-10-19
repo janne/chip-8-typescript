@@ -4,10 +4,12 @@ import { create, createWithData, step } from './chip-8/memory'
 import './App.css'
 import Display from './Display'
 import Registers from './Registers'
+import useKeyPress from './useKeyPress'
 
 const App = () => {
   const [mem, setMem] = useState(create())
   const [run, setRun] = useState(false)
+  const key = useKeyPress()
 
   const [filename, setFilename] = useState(
     'https://johnearnest.github.io/chip8Archive/roms/br8kout.ch8'
@@ -34,21 +36,25 @@ const App = () => {
   }
 
   useEffect(() => {
-    if (!run) return
     let timerId: number
 
     const f = () => {
-      for (let i = 0; i < 8; i++) {
-        setMem((mem) => step(mem))
-      }
-
+      setMem((mem) =>
+        Array(8)
+          .fill(null)
+          .reduce((memo) => step(memo), mem)
+      )
       timerId = requestAnimationFrame(f)
     }
 
     timerId = requestAnimationFrame(f)
 
     return () => cancelAnimationFrame(timerId)
-  }, [run])
+  }, [])
+
+  useEffect(() => {
+    setMem((mem) => ({ ...mem, pressedKey: key }))
+  }, [key])
 
   return (
     <div className="App">
