@@ -172,7 +172,7 @@ const instructions: Array<Opcode> = [
     exec: (mem, x, y) => {
       const registers = mem.registers.slice()
       const sum = registers[x] + registers[y]
-      registers[0xf] = sum > 255 ? 1 : 0
+      registers[0xf] = sum > 0xff ? 1 : 0
       registers[x] = sum % 0x100
       return { ...mem, registers }
     },
@@ -269,7 +269,7 @@ const instructions: Array<Opcode> = [
     mnemonic: (x, kk) => `RND V${x}, ${kk}`,
     exec: (mem, x, kk) => {
       const registers = mem.registers.slice()
-      registers[x] = Math.round(Math.random() * 255) & kk
+      registers[x] = Math.round(Math.random() * 0xff) & kk
       return { ...mem, registers }
     },
   },
@@ -385,9 +385,9 @@ const instructions: Array<Opcode> = [
     arguments: 'x',
     mnemonic: (x) => `LD F, V${x}`,
     exec: (mem, x) => {
-      if (x < 0 || x > 15) throw new Error('Registers out of bounds')
+      if (x < 0 || x > 0xf) throw new Error('Registers out of bounds')
       const digit = mem.registers[x]
-      if (digit < 0 || digit > 15) throw new Error('Memory out of bounds')
+      if (digit < 0 || digit > 0xf) throw new Error('Memory out of bounds')
       return { ...mem, indexRegister: digit * 5 }
     },
   },
@@ -413,7 +413,7 @@ const instructions: Array<Opcode> = [
     arguments: 'x',
     mnemonic: (x) => `LD [I], V${x}`,
     exec: (mem, x) => {
-      if (x < 0 || x > 15) throw new Error('Registers out of bounds')
+      if (x < 0 || x > 0xf) throw new Error('Registers out of bounds')
       if (mem.indexRegister + x > SIZE) throw new Error('Memory out of bounds')
       const ram = mem.ram.slice()
       mem.registers.slice(0, x + 1).forEach((v, i) => {
@@ -430,7 +430,7 @@ const instructions: Array<Opcode> = [
     mnemonic: (x) => `LD V${x}, [I]`,
     exec: (mem, x) => {
       const registers = mem.registers.slice()
-      if (x < 0 || x > 15) throw new Error('Registers out of bounds')
+      if (x < 0 || x > 0xf) throw new Error('Registers out of bounds')
       mem.ram
         .slice(mem.indexRegister, mem.indexRegister + x + 1)
         .forEach((v, i) => {
@@ -473,24 +473,24 @@ const checkArguments = (argsType: string | undefined, ...args: number[]) => {
       if (a < 0 || a >= SIZE) throw new Error(`Memory out of bounds: ${a}`)
       break
     case 'x':
-      if (a < 0 || a > 15) throw new Error(`Register out of bounds: ${a}`)
+      if (a < 0 || a > 0xf) throw new Error(`Register out of bounds: ${a}`)
       break
     case 'xkk':
       if (b === undefined) throw new Error('Invalid arguments')
-      if (a < 0 || a > 15) throw new Error(`Register out of bounds: ${a}`)
-      if (b < 0 || b > 255) throw new Error(`Number out of bounds: ${b}`)
+      if (a < 0 || a > 0xf) throw new Error(`Register out of bounds: ${a}`)
+      if (b < 0 || b > 0xff) throw new Error(`Number out of bounds: ${b}`)
       break
     case 'xy':
       if (b === undefined) throw new Error('Invalid arguments')
-      if (a < 0 || a > 15) throw new Error(`Register out of bounds: ${a}`)
-      if (b < 0 || b > 15) throw new Error(`Register out of bounds: ${b}`)
+      if (a < 0 || a > 0xf) throw new Error(`Register out of bounds: ${a}`)
+      if (b < 0 || b > 0xf) throw new Error(`Register out of bounds: ${b}`)
       break
     case 'xyn':
       if (b === undefined || c === undefined)
         throw new Error('Invalid arguments')
-      if (a < 0 || a > 15) throw new Error(`Register out of bounds: ${a}`)
-      if (b < 0 || b > 15) throw new Error(`Register out of bounds: ${b}`)
-      if (c < 0 || c > 15) throw new Error(`Value out of bounds: ${c}`)
+      if (a < 0 || a > 0xf) throw new Error(`Register out of bounds: ${a}`)
+      if (b < 0 || b > 0xf) throw new Error(`Register out of bounds: ${b}`)
+      if (c < 0 || c > 0xf) throw new Error(`Value out of bounds: ${c}`)
   }
 }
 
