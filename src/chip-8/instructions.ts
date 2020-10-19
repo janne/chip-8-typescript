@@ -211,8 +211,8 @@ const instructions: Array<Opcode> = [
     mnemonic: (x, y) => `SUBN V${x}, V${y}`,
     exec: (mem, x, y) => {
       const registers = mem.registers.slice()
-      registers[x] = registers[y] - registers[x]
       registers[0xf] = registers[y] > registers[x] ? 1 : 0
+      registers[x] = registers[y] - registers[x]
       return { ...mem, registers }
     },
   },
