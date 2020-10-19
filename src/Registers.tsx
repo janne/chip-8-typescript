@@ -19,6 +19,7 @@ const Registers = ({ mem }: Props) => (
           <th>I</th>
           <th>DT</th>
           <th>ST</th>
+          <th>Key</th>
           <th className="mnemonic">Mnemonic</th>
         </tr>
       </thead>
@@ -37,6 +38,11 @@ const Registers = ({ mem }: Props) => (
           </td>
           <td>{mem.delayTimer.toString(16).toUpperCase().padStart(2, '0')}</td>
           <td>{mem.soundTimer.toString(16).toUpperCase().padStart(2, '0')}</td>
+          <td>
+            {mem.pressedKey === null
+              ? ''
+              : mem.pressedKey.toString(16).toUpperCase().padStart(2, '0')}
+          </td>
           <td>{getMnemonic(currentOpcode(mem))}</td>
         </tr>
       </tbody>

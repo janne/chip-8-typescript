@@ -13,6 +13,7 @@ export interface Memory {
   soundTimer: number
   delayTimer: number
   display: boolean[][]
+  pressedKey: number | null
 }
 
 export const create = (): Memory => {
@@ -27,6 +28,7 @@ export const create = (): Memory => {
     delayTimer: 0,
     programCounter: START,
     display: emptyDisplay(),
+    pressedKey: null,
   }
 }
 

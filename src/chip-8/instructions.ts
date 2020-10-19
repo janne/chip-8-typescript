@@ -313,9 +313,10 @@ const instructions: Array<Opcode> = [
     mask: 0xf0ff,
     arguments: 'x',
     mnemonic: (x) => `SKP V${x}`,
-    exec: (mem, x) => {
-      throw new Error('Not implemented yet')
-    },
+    exec: (mem, x) =>
+      mem.registers[x] === mem.pressedKey
+        ? { ...mem, programCounter: mem.programCounter + 4 }
+        : mem,
   },
   {
     // Skip next instruction if key with the value of Vx is not pressed
@@ -323,9 +324,10 @@ const instructions: Array<Opcode> = [
     mask: 0xf0ff,
     arguments: 'x',
     mnemonic: (x) => `SKNP V${x}`,
-    exec: (mem, x) => {
-      throw new Error('Not implemented yet')
-    },
+    exec: (mem, x) =>
+      mem.registers[x] !== mem.pressedKey
+        ? { ...mem, programCounter: mem.programCounter + 4 }
+        : mem,
   },
   {
     // Set Vx = delay timer value
