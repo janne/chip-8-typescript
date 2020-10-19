@@ -15,6 +15,7 @@ export interface Memory {
   display: boolean[][]
   pressedKey: number | null
   running: boolean
+  waitingForKey: boolean
 }
 
 export const create = (): Memory => {
@@ -30,6 +31,7 @@ export const create = (): Memory => {
     programCounter: START,
     display: emptyDisplay(),
     pressedKey: null,
+    waitingForKey: false,
     running: false,
   }
 }

@@ -348,7 +348,13 @@ const instructions: Array<Opcode> = [
     arguments: 'x',
     mnemonic: (x) => `LD V${x}, K`,
     exec: (mem, x) => {
-      throw new Error('Not implemented yet')
+      if (mem.pressedKey !== null) {
+        const registers = mem.registers.slice()
+        registers[x] = mem.pressedKey
+        return { ...mem, registers, waitingForKey: false }
+      }
+      if (!mem.waitingForKey) return { ...mem, waitingForKey: true }
+      return mem
     },
   },
   {
@@ -510,7 +516,7 @@ export const execute = (mem: Memory, opcode: number): Memory => {
   return {
     ...nextMem,
     programCounter:
-      mem.programCounter === nextMem.programCounter
+      mem.programCounter === nextMem.programCounter && !nextMem.waitingForKey
         ? mem.programCounter + 2
         : nextMem.programCounter,
   }
