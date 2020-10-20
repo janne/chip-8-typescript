@@ -391,7 +391,6 @@ const instructions: Array<Opcode> = [
     arguments: 'x',
     mnemonic: (x) => `LD F, V${x}`,
     exec: (mem, x) => {
-      if (x < 0 || x > 0xf) throw new Error('Registers out of bounds')
       const digit = mem.registers[x]
       if (digit < 0 || digit > 0xf) throw new Error('Memory out of bounds')
       return { ...mem, indexRegister: digit * 5 }
@@ -419,13 +418,13 @@ const instructions: Array<Opcode> = [
     arguments: 'x',
     mnemonic: (x) => `LD [I], V${x}`,
     exec: (mem, x) => {
-      if (x < 0 || x > 0xf) throw new Error('Registers out of bounds')
-      if (mem.indexRegister + x > SIZE) throw new Error('Memory out of bounds')
+      const index = mem.indexRegister + x + 1
+      if (index >= SIZE) throw new Error('Memory out of bounds')
       const ram = mem.ram.slice()
       mem.registers.slice(0, x + 1).forEach((v, i) => {
         ram[mem.indexRegister + i] = v
       })
-      return { ...mem, ram }
+      return { ...mem, ram, indexRegister: index }
     },
   },
   {
@@ -435,14 +434,13 @@ const instructions: Array<Opcode> = [
     arguments: 'x',
     mnemonic: (x) => `LD V${x}, [I]`,
     exec: (mem, x) => {
+      const index = mem.indexRegister + x + 1
+      if (index >= SIZE) throw new Error('Memory out of bounds')
       const registers = mem.registers.slice()
-      if (x < 0 || x > 0xf) throw new Error('Registers out of bounds')
-      mem.ram
-        .slice(mem.indexRegister, mem.indexRegister + x + 1)
-        .forEach((v, i) => {
-          registers[i] = v
-        })
-      return { ...mem, registers }
+      mem.ram.slice(mem.indexRegister, index).forEach((v, i) => {
+        registers[i] = v
+      })
+      return { ...mem, registers, indexRegister: index }
     },
   },
 ]
